@@ -54,10 +54,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Breakout(modifier: Modifier = Modifier) {
+    // Remember keyword lets information survive recomposition
     var tapPosition by remember { mutableStateOf<Offset?>(null) }
     var dragOffset by remember { mutableStateOf(Offset(0f, 0f)) }
     var circlePosition by remember { mutableFloatStateOf(0f) }
+    // Start game with 8x8 blocks
     var game by remember { mutableStateOf<Game>(Game(8, 8, Size(1000f, 2000f))) }
+    // Textmeasurer is required for text on a canvas
     val textMeasurer = rememberTextMeasurer()
     val modifier = Modifier
         .fillMaxSize()
@@ -65,7 +68,7 @@ fun Breakout(modifier: Modifier = Modifier) {
         .pointerInput(Unit) {
             detectTapGestures { offset ->
                 // Detect the tap
-                // TODO: Make the ball go faster if the user taps the screen
+                // TODO: Make the ball go faster if the user taps the screen with good timing
                 tapPosition = offset
             }
         }
@@ -75,6 +78,7 @@ fun Breakout(modifier: Modifier = Modifier) {
                 dragOffset = dragAmount
                 game.paddle.x += dragAmount.x
 
+                // Prevent paddle from going offscreen
                 if (game.paddle.x + game.paddle.width > game.size.width){
                     game.paddle.x = game.size.width - game.paddle.width
                 }
@@ -134,7 +138,7 @@ fun drawScore(drawScope: DrawScope, game:Game, textMeasurer: TextMeasurer){
     var txtStyle: TextStyle = TextStyle(color = Color.Yellow, TextUnit(5f, TextUnitType.Em))
     var text = "";
     if (game.gameOver){
-        text = "Game over!"
+        text = "Game over! Score: ${game.score}"
     }else{
         text = "Score: ${game.score}"
     }
@@ -227,7 +231,7 @@ fun drawBall(drawScope: DrawScope, ball:Ball) {
 }
 
 fun drawBoxes(drawScope: DrawScope, game: Game){
-    // TODO: Draw the boxes more performantly
+    // TODO: Draw the boxes more performant
     var i = 0;
     for (box in game.blocksBroken){
         if (!box){
